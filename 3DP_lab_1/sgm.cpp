@@ -212,36 +212,22 @@ namespace sgm
           best_prev_cost = path_cost_[cur_path][cur_y - direction_y][cur_x - direction_x][i];
       }
 
-      //Please fill me!
+
       for (int i = 0; i < disparity_range_; ++i) {
                 // get the previous cost of the path
                 for (int j = 0; j < disparity_range_; ++j) {
-                        // prev_cost = path_cost_[cur_path][cur_y - direction_y][cur_x - direction_x][i];
-                        // best_prev_cost = prev_cost;
                     if (abs(i - j) == 1) {
                         // apply small penalty for disparity difference of 1
                         small_penalty_cost = previour_holder[j] + p1_;
                     } else if (abs(i - j) > 1) {
                         // apply big penalty for disparity difference greater than 1
-                        // big_penalty_cost = prev_cost + p2_;
                         big_penalty_cost = best_prev_cost + p2_;
                     } else if (abs(i - j) == 0) {
                         // apply no penalty for equal disparity
                         penalty_cost = previour_holder[j];
                     }
-                    // find the minimum cost among the penalty costs
-                    // if (small_penalty_cost < best_prev_cost) {
-                    //     best_prev_cost = small_penalty_cost;
-                    // }
-                    // if (big_penalty_cost < best_prev_cost) {
-                    //     best_prev_cost = big_penalty_cost;
-                    // }
-                    // if (penalty_cost < best_prev_cost) {
-                    //     best_prev_cost = penalty_cost;
-                    // }
                 }
                 // set the final cost for the current pixel in the path
-                // path_cost_[cur_path][cur_y][cur_x][i] = cost_[cur_y][cur_x][i] + best_prev_cost;
                 path_cost_[cur_path][cur_y][cur_x][i] = cost_[cur_y][cur_x][i] + std::min(std::min(small_penalty_cost, big_penalty_cost), penalty_cost) - best_prev_cost ;
 
             }
@@ -270,229 +256,102 @@ namespace sgm
       int start_x, start_y, end_x, end_y, step_x, step_y;
 
 
-      // if (dir_x == 0) {  // Vertical scan (no change in x)
-      //   start_x = pw_.west;
-      //   end_x = pw_.east;
-      //   step_x = 0;
-
-      //   if (dir_y == 1) {  // Downward
-      //     start_y = pw_.north;
-      //     end_y = pw_.south;
-      //     step_y = 1;
-      //   } else {  // Upward
-      //     start_y = pw_.south;
-      //     end_y = pw_.north;
-      //     step_y = -1;
-      //   }
-      // } else if (dir_x == 1) {  // Rightward scan (positive x movement)
-      //   start_x = pw_.west;
-      //   end_x = pw_.east;
-      //   step_x = 1;
-
-      //   if (dir_y == 0) {  // Horizontal (no change in y)
-      //     start_y = pw_.north;
-      //     end_y = pw_.south;
-      //     step_y = 0;
-      //   } else if (dir_y == 1) {  // Downward-right diagonal
-      //     start_y = pw_.north;
-      //     end_y = pw_.south;
-      //     step_y = 1;
-      //   } else {  // Upward-right diagonal
-      //     start_y = pw_.south;
-      //     end_y = pw_.north;
-      //     step_y = -1;
-      //   }
-      // } else {  // dir_x == -1 (Leftward scan)
-      //   start_x = pw_.east;
-      //   end_x = pw_.west;  // Adjust for loop condition (x != end_x)
-      //   step_x = -1;
-
-      //   if (dir_y == 0) {  // Horizontal (no change in y)
-      //     start_y = pw_.north;
-      //     end_y = pw_.south;
-      //     step_y = 0;
-      //   } else if (dir_y == 1) {  // Downward-left diagonal
-      //     start_y = pw_.north;
-      //     end_y = pw_.south;
-      //     step_y = 1;
-      //   } else {  // Upward-left diagonal
-      //     start_y = pw_.south;
-      //     end_y = pw_.north;
-      //     step_y = -1;
-      //   }
-      // }
-
-
-
       //=============================================================================
-if (dir_x == 0) {
-    start_x = pw_.west;
-    end_x = pw_.east;
-    step_x = 1;
-    step_y = 1;
-    switch (dir_y) {
-        case 1:
-            start_y = pw_.north;
-            end_y = pw_.south;
-            break;
-        case -1:
-            start_y = pw_.south;
-            end_y = pw_.north;
-            step_y = -1;
-            break;
-        default:
-            // Handle unexpected dir_y value
-            break;
-    }
-} else if (dir_x == 1) {
-    start_x = pw_.west;
-    end_x = pw_.east;
-    step_x = 1;
-    switch (dir_y) {
-        case 0:
-            start_y = pw_.north;
-            end_y = pw_.south;
-            step_y = 1;
-            break;
-        case 1:
-            start_y = pw_.north;
-            end_y = pw_.south;
-            step_y = 1;
-            break;
-        case -1:
-            start_y = pw_.south;
-            end_y = pw_.north;
-            step_y = -1;
-            break;
-        default:
-            // Handle unexpected dir_y value
-            break;
-    }
-} else if (dir_x == -1) {
-    start_x = pw_.east;
-    end_x = pw_.west;
-    step_x = -1;
-    switch (dir_y) {
-        case 0:
-            start_y = pw_.north;
-            end_y = pw_.south;
-            step_y = 1;
-            break;
-        case 1:
-            start_y = pw_.north;
-            end_y = pw_.south;
-            step_y = 1;
-            break;
-        case -1:
-            start_y = pw_.south;
-            end_y = pw_.north;
-            step_y = -1;
-            break;
-        default:
-            // Handle unexpected dir_y value
-            break;
-    }
-}
-
-    //==================================================================================================
-    // if (dir_x == 0){
-    //   if(dir_y == 1){
-    //             start_x = pw_.west;
-    //             start_y = pw_.north;
-    //             end_x = pw_.east;
-    //             end_y = pw_.south;
-    //             //
-    //             step_x = 0;
-    //             step_y = 1;
-    //   }else if(dir_y == -1){
-    //             start_x = pw_.west;
-    //             start_y = pw_.south;
-    //             end_x = pw_.east;
-    //             end_y = pw_.north;
-    //             step_x = 0;
-    //             step_y = -1;
-    //   }
-    // }else if(dir_x == 1){
-    //   if(dir_y == 0){
-    //             start_x = pw_.west;
-    //             start_y = pw_.north;
-    //             end_x = pw_.east;
-    //             end_y = pw_.south;
-    //             step_x = 1;
-    //             step_y = 0;
-    //   }else if(dir_y == 1){
-    //             start_x = pw_.west;
-    //             start_y = pw_.north;
-    //             end_x = pw_.east;
-    //             end_y = pw_.south;
-    //             step_x = 1;
-    //             step_y = 1;
-    //   }else if(dir_y == -1){
-    //             start_x = pw_.west;
-    //             start_y = pw_.south;
-    //             end_x = pw_.east;
-    //             end_y = pw_.north;
-    //             step_x = 1;
-    //             step_y = -1;
-    //   }
-    // }else if(dir_x == -1){
-    //   if(dir_y == 0){
-    //             start_x = pw_.east;
-    //             start_y = pw_.north;
-    //             end_x = pw_.west;
-    //             end_y = pw_.south;
-    //             step_x = -1;
-    //             step_y = 0;
-    //   }else if(dir_y == 1){
-    //             start_x = pw_.east;
-    //             start_y = pw_.north;
-    //             end_x = pw_.west;
-    //             end_y = pw_.south;
-    //             step_x = -1;
-    //             step_y = 1;
-    //   }else if(dir_y == -1){        
-    //             start_x = pw_.east;
-    //             start_y = pw_.south;
-    //             end_x = pw_.west;
-    //             end_y = pw_.north;
-    //             step_x = -1;
-    //             step_y = -1;
-    //   }
-    // }
-
-
-
-      // start_x = dir_x == -1 ? pw_.east : pw_.west;
-      // end_x = dir_x == -1 ? pw_.west : pw_.east;
-      // step_x = dir_x == -1 ? -1 : 1;
-
-      // start_y = dir_y == 1 ? pw_.south : pw_.north;
-      // end_y = dir_y == 1 ? pw_.north : pw_.south;
-      // step_y = dir_y == 1 ? -1 : 1;
-// if (dir_x == -1) {
-//     start_x = pw_.east;
-//     end_x = pw_.west;
-//     step_x = -1;
-// } else {
+// if (dir_x == 0) {
 //     start_x = pw_.west;
 //     end_x = pw_.east;
 //     step_x = 1;
-// }
-
-// if (dir_y == 1) {
-//     start_y = pw_.south;
-//     end_y = pw_.north;
-//     step_y = -1;
-// } else {
-//     start_y = pw_.north;
-//     end_y = pw_.south;
 //     step_y = 1;
+//     switch (dir_y) {
+//         case 1:
+//             start_y = pw_.north;
+//             end_y = pw_.south;
+//             break;
+//         case -1:
+//             start_y = pw_.south;
+//             end_y = pw_.north;
+//             step_y = -1;
+//             break;
+//         default:
+//             // Handle unexpected dir_y value
+//             break;
+//     }
+// } else if (dir_x == 1) {
+//     start_x = pw_.west;
+//     end_x = pw_.east;
+//     step_x = 1;
+//     switch (dir_y) {
+//         case 0:
+//             start_y = pw_.north;
+//             end_y = pw_.south;
+//             step_y = 1;
+//             break;
+//         case 1:
+//             start_y = pw_.north;
+//             end_y = pw_.south;
+//             step_y = 1;
+//             break;
+//         case -1:
+//             start_y = pw_.south;
+//             end_y = pw_.north;
+//             step_y = -1;
+//             break;
+//         default:
+//             // Handle unexpected dir_y value
+//             break;
+//     }
+// } else if (dir_x == -1) {
+//     start_x = pw_.east;
+//     end_x = pw_.west;
+//     step_x = -1;
+//     switch (dir_y) {
+//         case 0:
+//             start_y = pw_.north;
+//             end_y = pw_.south;
+//             step_y = 1;
+//             break;
+//         case 1:
+//             start_y = pw_.north;
+//             end_y = pw_.south;
+//             step_y = 1;
+//             break;
+//         case -1:
+//             start_y = pw_.south;
+//             end_y = pw_.north;
+//             step_y = -1;
+//             break;
+//         default:
+//             // Handle unexpected dir_y value
+//             break;
+//     }
 // }
-
 
     //==================================================================================================
 
-      // ======================================================================================================================================
+
+
+      if (dir_x == -1) {
+          start_x = pw_.east;
+          end_x = pw_.west;
+          step_x = -1;
+      } else {
+          start_x = pw_.west;
+          end_x = pw_.east;
+          step_x = 1;
+      }
+
+      if (dir_y == -1) {
+          start_y = pw_.south;
+          end_y = pw_.north;
+          step_y = -1;
+      } else {
+          start_y = pw_.north;
+          end_y = pw_.south;
+          step_y = 1;
+      }
+
+
+
      for(int y = start_y; y != end_y ; y+=step_y)
      {
        for(int x = start_x; x != end_x ; x+=step_x)
@@ -506,7 +365,7 @@ if (dir_x == 0) {
      }
      
         std::cout << "Path : ( X : " << dir_x << " , Y : " << dir_y << ") " <<  endl;
-  // ======================================================================================================================================
+
 
       /////////////////////////////////////////////////////////////////////////////////////////
     }
@@ -530,7 +389,6 @@ if (dir_x == 0) {
                 min_on_path = path_cost_[path][row][col][d];
                 disp = d;
               }
-
           }
           inv_confidence_[row][col] += (min_on_path - alpha * cost_[row][col][disp]);
 
@@ -576,8 +434,7 @@ if (dir_x == 0) {
                 // to estimate the unknown scale factor.    
                 /////////////////////////////////////////////////////////////////////////////////////////
                 good_disparities.push_back(smallest_disparity);
-                unscaled_disparities.push_back(mono_.at<uchar>(row, col));
-                
+                unscaled_disparities.push_back(static_cast<float>(mono_.at<uchar>(row, col)));
                 
                 
                 
@@ -640,7 +497,7 @@ if (dir_x == 0) {
             {
                 // double scaled_disparity = x.at<double>(0, 0) * mono_.at<uchar>(row, col) + x.at<double>(1, 0);
                 double scaled_disparity = x(0) * mono_.at<uchar>(row, col) + x(1);
-                if (inv_confidence_[row][col] > 0 || inv_confidence_[row][col] < conf_thresh_)
+                if (inv_confidence_[row][col] > 0 && inv_confidence_[row][col] > conf_thresh_)
                 {
                     disp_.at<uchar>(row, col) = scaled_disparity * 255.0 / disparity_range_;
                 }
