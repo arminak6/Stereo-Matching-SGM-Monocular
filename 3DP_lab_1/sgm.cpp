@@ -196,7 +196,6 @@ namespace sgm
     // if the processed pixel is the first:
     if(cur_y == pw_.north || cur_y == pw_.south || cur_x == pw_.east || cur_x == pw_.west)
     {
-      //Please fill me!
       for (int i = 0; i < disparity_range_; ++i) {
                 // set the initial cost for the first pixel in the path
           path_cost_[cur_path][cur_y][cur_x][i] = cost_[cur_y][cur_x][i];
@@ -204,6 +203,7 @@ namespace sgm
     }
 
     else{
+      //initial best_prev_cost with very big number
       best_prev_cost = 100000000;
       int previour_holder[disparity_range_];
       for (int i = 0; i < disparity_range_; ++i) {
@@ -212,7 +212,7 @@ namespace sgm
           best_prev_cost = path_cost_[cur_path][cur_y - direction_y][cur_x - direction_x][i];
       }
 
-
+      // with 2 loop try to compute E smooth
       for (int i = 0; i < disparity_range_; ++i) {
                 // get the previous cost of the path
                 for (int j = 0; j < disparity_range_; ++j) {
@@ -255,81 +255,7 @@ namespace sgm
       
       int start_x, start_y, end_x, end_y, step_x, step_y;
 
-
-      //=============================================================================
-// if (dir_x == 0) {
-//     start_x = pw_.west;
-//     end_x = pw_.east;
-//     step_x = 1;
-//     step_y = 1;
-//     switch (dir_y) {
-//         case 1:
-//             start_y = pw_.north;
-//             end_y = pw_.south;
-//             break;
-//         case -1:
-//             start_y = pw_.south;
-//             end_y = pw_.north;
-//             step_y = -1;
-//             break;
-//         default:
-//             // Handle unexpected dir_y value
-//             break;
-//     }
-// } else if (dir_x == 1) {
-//     start_x = pw_.west;
-//     end_x = pw_.east;
-//     step_x = 1;
-//     switch (dir_y) {
-//         case 0:
-//             start_y = pw_.north;
-//             end_y = pw_.south;
-//             step_y = 1;
-//             break;
-//         case 1:
-//             start_y = pw_.north;
-//             end_y = pw_.south;
-//             step_y = 1;
-//             break;
-//         case -1:
-//             start_y = pw_.south;
-//             end_y = pw_.north;
-//             step_y = -1;
-//             break;
-//         default:
-//             // Handle unexpected dir_y value
-//             break;
-//     }
-// } else if (dir_x == -1) {
-//     start_x = pw_.east;
-//     end_x = pw_.west;
-//     step_x = -1;
-//     switch (dir_y) {
-//         case 0:
-//             start_y = pw_.north;
-//             end_y = pw_.south;
-//             step_y = 1;
-//             break;
-//         case 1:
-//             start_y = pw_.north;
-//             end_y = pw_.south;
-//             step_y = 1;
-//             break;
-//         case -1:
-//             start_y = pw_.south;
-//             end_y = pw_.north;
-//             step_y = -1;
-//             break;
-//         default:
-//             // Handle unexpected dir_y value
-//             break;
-//     }
-// }
-
-    //==================================================================================================
-
-
-
+      // dir_x OR dir_y will do same action with 1 or 0 value
       if (dir_x == -1) {
           start_x = pw_.east;
           end_x = pw_.west;
@@ -433,7 +359,7 @@ namespace sgm
                 // guess mono_.at<uchar>(row, col) to the pool of disparity pairs that will be used 
                 // to estimate the unknown scale factor.    
                 /////////////////////////////////////////////////////////////////////////////////////////
-                good_disparities.push_back(smallest_disparity);
+                good_disparities.push_back(smallest_disparity*255.0/disparity_range_);
                 unscaled_disparities.push_back(static_cast<float>(mono_.at<uchar>(row, col)));
                 
                 
@@ -457,17 +383,7 @@ namespace sgm
 
       
       
-          // Estimate linear coefficients using least squares
-        // Mat A(good_disparities.size(), 2, CV_64FC1);
-        // Mat b(good_disparities.size(), 1, CV_64FC1);
-        // for (int i = 0; i < good_disparities.size(); ++i)
-        // {
-        //     A.at<double>(i, 0) = unscaled_disparities[i];
-        //     A.at<double>(i, 1) = 1;
-        //     b.at<double>(i, 0) = good_disparities[i];
-        // }
-        // Mat x;
-        // solve(A, b, x, DECOMP_NORMAL);
+
 
 
         int n = good_disparities.size();
@@ -499,7 +415,7 @@ namespace sgm
                 double scaled_disparity = x(0) * mono_.at<uchar>(row, col) + x(1);
                 if (inv_confidence_[row][col] > 0 && inv_confidence_[row][col] > conf_thresh_)
                 {
-                    disp_.at<uchar>(row, col) = scaled_disparity * 255.0 / disparity_range_;
+                    disp_.at<uchar>(row, col) = scaled_disparity;
                 }
             }
         }
