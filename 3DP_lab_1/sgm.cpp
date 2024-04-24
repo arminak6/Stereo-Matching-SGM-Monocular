@@ -197,7 +197,7 @@ namespace sgm
     if(cur_y == pw_.north || cur_y == pw_.south || cur_x == pw_.east || cur_x == pw_.west)
     {
       for (int i = 0; i < disparity_range_; ++i) {
-                // set the initial cost for the first pixel in the path
+          // set the initial cost for the first pixel in the path
           path_cost_[cur_path][cur_y][cur_x][i] = cost_[cur_y][cur_x][i];
         }
     }
@@ -413,7 +413,7 @@ namespace sgm
             {
                 // double scaled_disparity = x.at<double>(0, 0) * mono_.at<uchar>(row, col) + x.at<double>(1, 0);
                 double scaled_disparity = x(0) * mono_.at<uchar>(row, col) + x(1);
-                if (inv_confidence_[row][col] > 0 && inv_confidence_[row][col] > conf_thresh_)
+                if (inv_confidence_[row][col] <= 0 || inv_confidence_[row][col] >= conf_thresh_)
                 {
                     disp_.at<uchar>(row, col) = scaled_disparity;
                 }
